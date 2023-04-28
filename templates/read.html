@@ -1,23 +1,31 @@
 {% extends 'base.html' %}
 
 {% block container %}
-<h2>Read</h2>
-<p>This page shows information pulled from a MongoDB database collection.
+<h2>Search</h2>
+<form method="GET" action="{{ url_for('read') }}">
+    <input type="text" name="search" value="{{ search }}" placeholder="Search...">
+    <input type="submit" value="Search">
+</form>
+<h2>Posts</h2>
+
         
     {% for doc in docs %}
-    <div>
-        <hr class="solid">
-        <p class="post">
-            Posted by {{doc.name}} at {{ doc.created_at.strftime("%H:%M on %d %B %Y") }}
-            </br>
-            <a href="{{ url_for('edit',mongoid=doc._id)}}">Edit</a> | <a href="{{ url_for('delete',mongoid=doc._id)}}">Delete</a>
-            </br>
-        </p>
-        <p>
-            {{ doc.message }}
-        </p>
-            
-    </div>
-    {%endfor%}
-</p>
+    <h2>{{ doc.name }}</h2>
+    <p>{{ doc.message }}</p>
+    <small>Posted on {{ doc.created_at }}</small>
+    <h3>Comments</h3>
+    <ul>
+        {% for comment in doc.comments %}
+            <li><strong>{{ comment.author }}</strong>: {{ comment.content }} <small>{{ comment.created_at }}</small></li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('edit', mongoid=doc._id) }}">Edit</a> |
+    <a href="{{ url_for('delete', mongoid=doc._id) }}">Delete</a> |
+    <a href="{{ url_for('add_comment', mongoid=doc._id) }}">Add Comment</a>
+    <hr>
+{% endfor %}
+
+{{ pagination.links }}
 {% endblock %}
+
+
