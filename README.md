@@ -36,5 +36,8 @@ The search function was implemented by modifying the read.html template to inclu
 ### 5. Pagination
 Pagination was implemented using the Pagination utility from Flask. This allowed for easy navigation through large collections of data in the application.
 
-### 6. Conclusion
+### 6. Upvote function
+I added an upvote function by increment 1 in doc each time user asses upvote button.
+
+### 7. Conclusion
 In conclusion, we have successfully built a simple forum application that meets the given requirements and allows users to interact with data in an intuitive and effortless manner. The application features a comment function, search functionality, and pagination, and demonstrates the power and flexibility of Flask and PyMongo in building web applications.
