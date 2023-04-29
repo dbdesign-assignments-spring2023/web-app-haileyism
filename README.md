@@ -2,6 +2,8 @@
 
 ## Introduction
 
+1 day late
+
 In this report, we present a simple forum application that allows users to interact with data from a MongoDB database in an intuitive and effortless manner. The application is built using Python, Flask, and PyMongo, and deployed on the NYU CS Department's web server and MongoDB server. The application meets the given requirements and features a comment function, search functionality, and pagination.
 
 ### 1. Technologies Used
