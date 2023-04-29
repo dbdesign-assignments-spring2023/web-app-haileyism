@@ -80,3 +80,21 @@ Each repository on GitHub has a set of Settings for Webhooks. In those settings,
 ![Webhook settings](./images/webhook_settings.png)
 
 If attempting to test this webhook technique on a local instance of the web app, GitHub will not be able to make requests to your local machine. To solve this, is possible to use a tool such as [ngrok](https://ngrok.com/) to provide a public URL that forwards requests to your local machine. In such a scenario, with ngrok installed, you would set up ngrok to forward all HTTP requests to port `5000` of your local machine with the command, `ngrok http 5000`. Then enter the appropriate public ngrok address - something like `https://7ccd453a429f.ngrok.io/webhook/` - into the GitHub webhook "Payload URL" setting.
+
+ssh wp705@i6.cims.nyu.edu
+cd public_html
+git clone http://haileyism@github.com/dbdesign-assignments-spring2023/web-app-haileyism
+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
+git clone git@github.com:dbdesign-assignments-spring2023/web-app-haileyism.git
+
+git clone https://github.com/dbdesign-assignments-spring2023/web-app-haileyism.git
+
+cd web-app-haileyism
+emacs .env
+
+/usr/local/opt/mongodb-community@4.4/bin/mongod --config /usr/local/etc/mongod.conf
+brew services start mongodb-community@4.4
+
+export FLASK_APP=app
+export FLASK_ENV=development
+flask run

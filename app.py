@@ -9,6 +9,7 @@ import os
 import subprocess
 from flask_paginate import Pagination, get_page_args
 
+
 # instantiate the app
 app = Flask(__name__)
 
@@ -87,6 +88,7 @@ def create_post():
     # create a new document with the data the user entered
     doc = {
     "name": name,
+    "upvotes": 0,
     "message": message,
     "comments": [],  # add this line
     "created_at": datetime.datetime.utcnow()
@@ -119,8 +121,8 @@ def edit_post(mongoid):
     doc = {
     "name": name,
     "message": message,
-    "comments": [],  # add this line
-    "created_at": datetime.datetime.utcnow()
+    "comments": [], 
+    "created_at": datetime.datetime.utcnow().date()
     }
 
 
@@ -156,7 +158,15 @@ def add_comment(mongoid):
     doc = db.exampleapp.find_one({"_id": ObjectId(mongoid)})
     return render_template('comment_form.html', doc=doc)
 
+@app.route('/upvote/<mongoid>', methods=['POST'])
+def upvote(mongoid):
+    
+    db.exampleapp.update_one(
+        {"_id": ObjectId(mongoid)},
+        {"$inc": {"upvotes": 1}}
+    )
 
+    return redirect(url_for('read'))
 
 @app.route('/delete/<mongoid>')
 def delete(mongoid):

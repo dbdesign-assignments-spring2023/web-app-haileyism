@@ -1,6 +1,5 @@
 # A Simple Forum Application using Flask, PyMongo, and Pagination
-## late submission:
-1 day late
+
 ## Introduction
 
 In this report, we present a simple forum application that allows users to interact with data from a MongoDB database in an intuitive and effortless manner. The application is built using Python, Flask, and PyMongo, and deployed on the NYU CS Department's web server and MongoDB server. The application meets the given requirements and features a comment function, search functionality, and pagination.
