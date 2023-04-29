@@ -22,6 +22,9 @@
     <a href="{{ url_for('edit', mongoid=doc._id) }}">Edit</a> |
     <a href="{{ url_for('delete', mongoid=doc._id) }}">Delete</a> |
     <a href="{{ url_for('add_comment', mongoid=doc._id) }}">Add Comment</a>
+    <form action="{{ url_for('upvote', mongoid=doc._id) }}" method="post">
+        <button type="submit">Upvote ({{ doc.upvotes }})</button>
+    </form>
     <hr>
 {% endfor %}
 
