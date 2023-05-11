@@ -7,6 +7,8 @@ import datetime
 from bson.objectid import ObjectId
 import os
 import subprocess
+from flask_paginate import Pagination, get_page_args
+
 
 # instantiate the app
 app = Flask(__name__)
@@ -39,14 +41,30 @@ def home():
 
 
 @app.route('/read')
-def read():
-    """
-    Route for GET requests to the read page.
-    Displays some information for the user with links to other pages.
-    """
-    docs = db.exampleapp.find({}).sort("created_at", -1) # sort in descending order of created_at timestamp
-    return render_template('read.html', docs=docs) # render the read template
+# def read():
+#     """
+#     Route for GET requests to the read page.
+#     Displays some information for the user with links to other pages.
+#     """
+#     docs = db.exampleapp.find({}).sort("created_at", -1) # sort in descending order of created_at timestamp
+#     return render_template('read.html', docs=docs) # render the read template
 
+def read():
+    search = request.args.get('search', '')
+    page, per_page, offset = get_page_args()
+    total_docs = db.exampleapp.find({"name": {"$regex": search, "$options": "i"}}).count()
+    
+    docs = db.exampleapp.find(
+    {"$or": [
+        {"name": {"$regex": search, "$options": "i"}},
+        {"message": {"$regex": search, "$options": "i"}}
+    ]}
+    ).sort("created_at", -1).skip(offset).limit(per_page)
+
+
+    pagination = Pagination(page=page, total=total_docs, per_page=per_page, record_name='docs', css_framework='bootstrap4')
+
+    return render_template('read.html', docs=docs, pagination=pagination, search=search)
 
 @app.route('/create')
 def create():
@@ -69,10 +87,13 @@ def create_post():
 
     # create a new document with the data the user entered
     doc = {
-        "name": name,
-        "message": message, 
-        "created_at": datetime.datetime.utcnow()
+    "name": name,
+    "upvotes": 0,
+    "message": message,
+    "comments": [],  # add this line
+    "created_at": datetime.datetime.utcnow()
     }
+
     db.exampleapp.insert_one(doc) # insert a new document
 
     return redirect(url_for('read')) # tell the browser to make a request for the /read route
@@ -98,11 +119,12 @@ def edit_post(mongoid):
     message = request.form['fmessage']
 
     doc = {
-        # "_id": ObjectId(mongoid), 
-        "name": name, 
-        "message": message, 
-        "created_at": datetime.datetime.utcnow()
+    "name": name,
+    "message": message,
+    "comments": [], 
+    "created_at": datetime.datetime.utcnow().date()
     }
+
 
     db.exampleapp.update_one(
         {"_id": ObjectId(mongoid)}, # match criteria
@@ -111,6 +133,40 @@ def edit_post(mongoid):
 
     return redirect(url_for('read')) # tell the browser to make a request for the /read route
 
+@app.route('/add_comment/<mongoid>', methods=['GET', 'POST'])
+def add_comment(mongoid):
+    """
+    Route for GET and POST requests to the add_comment page.
+    Displays a form users can fill out to add a comment to an existing post.
+    """
+    if request.method == 'POST':
+        author = request.form['author']
+        content = request.form['content']
+        comment = {
+            "author": author,
+            "content": content,
+            "created_at": datetime.datetime.utcnow()
+        }
+
+        db.exampleapp.update_one(
+            {"_id": ObjectId(mongoid)},
+            {"$push": {"comments": comment}}
+        )
+
+        return redirect(url_for('read'))
+
+    doc = db.exampleapp.find_one({"_id": ObjectId(mongoid)})
+    return render_template('comment_form.html', doc=doc)
+
+@app.route('/upvote/<mongoid>', methods=['POST'])
+def upvote(mongoid):
+    
+    db.exampleapp.update_one(
+        {"_id": ObjectId(mongoid)},
+        {"$inc": {"upvotes": 1}}
+    )
+
+    return redirect(url_for('read'))
 
 @app.route('/delete/<mongoid>')
 def delete(mongoid):
